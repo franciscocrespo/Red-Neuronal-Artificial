@@ -7,3 +7,6 @@ b = red.get_bias()
 print(ws)
 print(a)
 print(b)
+
+red.set_input_data([1, 2])
+print(a)
