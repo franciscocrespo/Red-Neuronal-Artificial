@@ -42,7 +42,7 @@ class RedNeuronal:
         return self.__a[k][i]
 
     # This method gets the bias input
-    def get_bias(self):
+    def get_b(self):
         return self.__b
 
     def get_b_by_id(self, i, k):
@@ -59,8 +59,10 @@ class RedNeuronal:
     def forward(self):
         k = 1
         while k < self.__k:
-            for i in range(self.__neurons_for_layer[k]):
-                ak_i = self.__ai_calculate(i, k)
+            neurons_for_layer = self.__neurons_for_layer[k]
+            neurons_for_layer_before = self.__neurons_for_layer[k - 1]
+            for i in range(neurons_for_layer):
+                ak_i = self.__ai_calculate(i, k, neurons_for_layer_before)
                 self.__set_aki(ak_i, k, i)
             k += 1
 
@@ -76,16 +78,12 @@ class RedNeuronal:
         return self.__a[k - 1][j] * self.__weights[k - 1][j][i]
 
     # This method gets the output i in the layer k of a neuron
-    def __ai_calculate(self, idx, layer_number):
-        ak_i = []
-        if layer_number > 0 & layer_number <= self.__k:
-            bi = self.__b[layer_number][idx]
-            sm = sum([self.__a_multiply_weight(layer_number, j, idx) for j in
-                      range(layer_number - 1)])
-            net = bi + sm
-            ak_i = self.__sigmoid_function(net)
-
-        return ak_i
+    def __ai_calculate(self, idx, layer_number, neurons_for_layer_before):
+        bi = self.__b[layer_number][idx]
+        sm = sum([self.__a_multiply_weight(layer_number, j, idx) for j in
+                      range(neurons_for_layer_before)])
+        net = bi + sm
+        return self.__sigmoid_function(net)
 
     def __set_aki(self, ak_i, k, i):
         self.__a[k][i] = ak_i
