@@ -7,6 +7,8 @@ class RedNeuronal:
     the number of neurons by layer.
     """
 
+    # CONSTRUCTOR
+
     def __init__(self, red_array):
         self.__k = len(red_array)
         self.__neurons_for_layer = [i for i in red_array]
@@ -17,6 +19,11 @@ class RedNeuronal:
                           for k in range(self.__k - 1)]
         self.__b = [[random.uniform(0.1, 0.2) for i in range(k)] for k in self.__neurons_for_layer]
         self.__target = []
+        self.__errors = []
+
+    # ----------------------------------------------------------------------------------------------------- #
+
+    # GETTERS AND SETTERS
 
     # This method sets the input data to the inputs of the neural network and right outputs for each inputs
     def set_input_data(self, input_data):
@@ -32,28 +39,54 @@ class RedNeuronal:
         return self.__weights
 
     def get_weight_by_id(self, i, j, k):
-        return self.__weights[k][i][j]
+        try:
+            return self.__weights[k][i][j]
+        except IndexError:
+            pass
 
     # This method gets the output of the last layer
     def get_a(self):
         return self.__a
 
     def get_a_by_id(self, i, k):
-        return self.__a[k][i]
+        try:
+            return self.__a[k][i]
+        except IndexError:
+            pass
 
     # This method gets the bias input
     def get_b(self):
         return self.__b
 
     def get_b_by_id(self, i, k):
-        return self.__b[k][i]
+        try:
+            return self.__b[k][i]
+        except IndexError:
+            pass
 
     # This method gets the target outputs
     def get_target(self):
         return self.__target
 
     def get_target_by_id(self, i):
-        return self.__target[i]
+        try:
+            return self.__target[i]
+        except IndexError:
+            pass
+
+    # This method gets the target outputs
+    def get_errors(self):
+        return self.__errors
+
+    def get_error_by_id(self, i):
+        try:
+            return self.__errors[i]
+        except IndexError:
+            pass
+
+    # ----------------------------------------------------------------------------------------------------- #
+
+    # FORWARD
 
     # This method gets the global outputs of the artificial neural network
     def forward(self):
@@ -66,8 +99,45 @@ class RedNeuronal:
                 self.__set_aki(ak_i, k, i)
             k += 1
 
+    # ----------------------------------------------------------------------------------------------------- #
 
-    # Auxiliary functions
+    # BACK PROPAGATION
+
+    # This method gets the error for the global output
+    def total_error(self):
+        neurons_last_k = self.__neurons_for_layer[self.__k - 1]
+        for i in range(neurons_last_k):
+            diff = self.__target[i] - self.__a[neurons_last_k][i]
+            error = 1/2 * pow(diff, 2)
+            self.__errors.append(error)
+
+        return sum(self.__errors)
+
+    # This Method gets the delta of the error with respect Y sub i
+    def delta_error_yi(self, idx):
+        try:
+            last_layer = self.__last_layer()
+            y_i = self.__a[last_layer][idx]
+            s_i = self.__target[idx]
+            de = -(s_i - y_i)
+            return de
+        except IndexError:
+            pass
+
+    def delta_last_layer_sub_i(self, idx):
+        try:
+            last_layer = self.__last_layer()
+            y_i = self.__a[last_layer][idx]
+            return y_i * (1 - y_i)
+        except IndexError:
+            pass
+
+    def delta_hidden_layers_sub_i(self, idx, k):
+        pass
+
+    # ----------------------------------------------------------------------------------------------------- #
+
+    # AUXILIARY FUNCTIONS
 
     # This method applies the sigma function to the input of a neuron
     @staticmethod
@@ -87,3 +157,7 @@ class RedNeuronal:
 
     def __set_aki(self, ak_i, k, i):
         self.__a[k][i] = ak_i
+
+    def __last_layer(self):
+        return self.__k - 1
+
