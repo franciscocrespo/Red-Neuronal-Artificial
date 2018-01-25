@@ -133,7 +133,16 @@ class RedNeuronal:
             pass
 
     def delta_hidden_layers_sub_i(self, idx, k):
-        pass
+        ap_super_k = self.__a[k][idx]
+        self.__sigmoid_prime(ap_super_k)
+        sum = 0
+        while k > 0 & k < self.__last_layer():
+            num = self.__last_layer() - k
+            for i in range(len(self.__neurons_for_layer[num])):
+                for j in range(len(self.__neurons_for_layer[num + 1])):
+                    sum += self.__weights[num][i][j]
+                    pass # to be continued
+
 
     # ----------------------------------------------------------------------------------------------------- #
 
@@ -160,4 +169,9 @@ class RedNeuronal:
 
     def __last_layer(self):
         return self.__k - 1
+
+    def __sigmoid_prime(self, z):
+        return self.__sigmoid_function(z) * (1 - self.__sigmoid_function(z))
+
+
 
